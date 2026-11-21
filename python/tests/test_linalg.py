@@ -114,6 +114,24 @@ class TestLinalg(mlx_tests.MLXTestCase):
         out_mx = mx.linalg.norm(x_mx, ord="fro")
         self.assertTrue(np.allclose(out_np, out_mx, atol=1e-5, rtol=1e-6))
 
+        v_np = x_np[0].copy()
+        v_np[1] = 0
+        v_mx = mx.array(v_np)
+        for o in [0, 1, -1, 3, 0.5, float("inf"), -float("inf")]:
+            out_np = np.linalg.norm(v_np, ord=o)
+            out_mx = mx.linalg.norm(v_mx, ord=o)
+            with self.subTest(ord=o):
+                self.assertEqual(out_mx.dtype, mx.float32)
+                self.assertTrue(np.allclose(out_np, out_mx, atol=1e-5, rtol=1e-6))
+
+        for o in [1, -1, 2, -2, float("inf"), -float("inf")]:
+            stream = mx.cpu if o in [-2, 2] else mx.default_device()
+            out_np = np.linalg.norm(x_np, ord=o)
+            out_mx = mx.linalg.norm(x_mx, ord=o, stream=stream)
+            with self.subTest(ord=o):
+                self.assertEqual(out_mx.dtype, mx.float32)
+                self.assertTrue(np.allclose(out_np, out_mx, atol=1e-5, rtol=1e-6))
+
     def test_qr_factorization(self):
         with self.assertRaises(ValueError):
             mx.linalg.qr(mx.array(0.0))

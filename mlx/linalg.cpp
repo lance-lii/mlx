@@ -71,7 +71,7 @@ inline array vector_norm(
     const std::vector<int>& axis,
     bool keepdims,
     StreamOrDevice s) {
-  auto dtype = at_least_float(a.dtype());
+  auto dtype = a.dtype() == complex64 ? float32 : at_least_float(a.dtype());
   if (ord == 0.0) {
     return astype(sum(not_equal(a, array(0), s), axis, keepdims, s), dtype, s);
   } else if (ord == 1.0) {
@@ -96,7 +96,7 @@ inline array matrix_norm(
     const std::vector<int>& axis,
     bool keepdims,
     StreamOrDevice s) {
-  auto dtype = at_least_float(a.dtype());
+  auto dtype = a.dtype() == complex64 ? float32 : at_least_float(a.dtype());
   int row_axis = (axis[0] < 0) ? axis[0] + a.ndim() : axis[0];
   int col_axis = (axis[1] < 0) ? axis[1] + a.ndim() : axis[1];
   if (ord == -1.0) {
